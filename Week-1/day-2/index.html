@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM — selecting & reading</title>
+    <style>
+        body{
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            height:50vh;
+            border: 2px solid black;
+        }
+        .bold{
+            font-size:20px;
+            font-weight:800;
+            background-color: lightblue;
+            padding:10px 10px;
+        }
+        input{margin-top:20px; }
+        .header{
+            display:flex;
+            flex-direction: column;
+            align-items:center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+    <div class="header">
+       <div id="element"> Lei Justine Clemente </div> 
+       <div class="school-name">La Consolacion University</div>
+    </div>
+
+    <input type="text"id="input" placeholder="Enter text">
+    <button onclick="submit()">Click to submit</button>
+    <button onclick="cancel()">Cancel</button>
+    </div>
+</body>
+<script>
+     // Get element by id:
+     const text = document.getElementById("element").textContent;
+     console.log(text);
+
+     // Query Selector:
+     const bold = document.querySelector(".school-name")
+     
+     //Onclick:
+     function submit(){
+       bold.classList.add("bold");
+    
+     //Get input value using getElementById
+       const inp = document.getElementById("input");
+       console.log(inp.value);
+     }
+     function cancel(){
+       bold.classList.remove("bold");
+       const del = document.getElementById("input");
+       del.value = '';
+     }
+
+     
+    
+</script>
+</html>

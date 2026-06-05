@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 3 - Changing the DOM</title>
+</head>
+<style>
+      body{
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 50vh;
+      }
+      .highlight{
+         font-weight: 900;
+         color:blue;
+      }
+     
+    
+    
+      
+
+</style>
+<body>
+      <h1 id="title">Student Portal</h1>
+      <div style="display: flex; gap:5px;">
+         <span>Highlight:</span>
+         <span id="toggle">Inactive</span>
+      </div>
+
+      <input type="text" id="name" placeholder="Enter your name">
+      <ul id="student-list">
+        <li>Anna</li>
+        <li>Ben</li>
+      </ul>
+     
+
+     <div>
+       <button onclick="changeTitle()">Change Title</button>
+       <button onclick="toggleHighlight()">Toggle Highlight</button>
+       <button onclick="addStudent()">Add Student</button>
+       <button onclick="removeFirst()">Remove First</button>
+     </div>
+</body>
+     <script>
+
+         // adds a new li in ul.
+         function addStudent(){
+            const name = document.getElementById("name").value;
+            const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+            const list = document.createElement("li");
+            list.textContent = capitalized;
+            document.getElementById("student-list").appendChild(list);
+         }
+
+         // change the title
+         function changeTitle(){
+            const title = document.getElementById("title").textContent = "LCUP DASHBOARD"
+         }
+
+         // toggles bold highlight
+         function toggleHighlight(){
+            const tog = document.getElementById("toggle").classList.toggle("highlight");
+         }
+         // removes the first index.
+         function removeFirst(){
+            const removeFirst = document.querySelector("#student-list li");
+            if(removeFirst) removeFirst.remove();
+         }
+        
+        
+     </script>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 4 — Event Listeners</title>
+</head>
+<style>
+    body{
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+     h3 {
+      border-bottom: 2px solid black;
+      padding-bottom: 6px;
+      margin-top: 40px;
+     }
+    .click{
+        display:flex;
+        justify-content: center;
+        width:80px;
+        border:2px solid black;
+        padding:10px 12px;
+        cursor: pointer;
+        user-select: none;
+    }
+    .click:hover{
+        background-color: black;
+        color:white;
+    }
+    .input{
+       margin:15px 0;
+       border:2px solid black;
+       width:500px;
+       display:flex;
+       padding:10px 12px;
+       cursor: text;
+    }
+    .highlight{
+        background-color: yellow;
+        font-weight: 50;  
+    }
+    input{
+      border:2px solid black;
+      padding:10px 12px;
+      margin-bottom: 5px;
+    }
+    input::placeholder{
+      color:gray;
+    }
+    .parent-div{
+        border:2px solid black;
+        background-color: lightgray;
+        padding:10px 15px 10px 10px;
+
+    }
+    button{
+        border:2px solid black;
+        padding:10px;
+        user-select: none;
+    }
+    button:hover{
+        background-color: black;
+        color:white;
+    }
+    .console-log{ 
+        border-radius: 5px;
+        margin-top:12px;
+        color: green; 
+        padding:12px 0 100px 12px;
+        background-color: black; 
+    }
+    
+</style>
+<body>
+    <h1>Event Listener Demo</h1>
+    <p>Open Console (F12) to see everything firing.</p>
+    <br>
+    
+    <h3>1. Basic click</h3>
+    <div class="click" id="clicker">Click me</div>
+    <div class="input" id="inp">Not clicked yet.</div>
+    <br>
+   
+    <h3>2. Multiple listeners on one button</h3>
+    <div class="click" id="multi-btn">Click me</div>
+    <div class="input" id="input-output">Nothing yet.</div>
+    <br>
+    
+    <h3>3. Input event — fires every keystroke</h3>
+    <input type="text" placeholder="Type Something..." id="get-input">
+    <div class="input" id="input-stroke">Waiting for input...</div>
+   
+    <h3>4. Event bubbling</h3>
+    <div class="parent-div" id="parent-listener">
+      <p>Parent div (listening for clicks)</p>
+      <button id="child-btn">Child Button</button>
+      <button id="child-stop">Child (stops bubbling)</button>
+      <button onclick="clearLog()">Clear</button>
+    </div>
+    <div class="console-log" id="log">
+        Console  log appears here...
+    </div>
+
+    <script>
+        // Demo 1 Basic click
+        const clicker = document.getElementById("clicker");
+        const inp = document.getElementById("inp");
+
+        clicker.addEventListener("click" , function(){
+         inp.textContent = "Button was clicked!";
+         console.log("Button was clicked!");
+        })
+
+
+        // Demo 2: Multiple listeners on one button
+        const btn = document.getElementById("multi-btn");
+        const outpt = document.getElementById("input-output");
+        
+        btn.addEventListener("click", function(){
+          outpt.textContent = "Listener 1 fired ✅";
+          console.log("Listener 1 fired ✅");
+        })
+        btn.addEventListener("click" , function(){
+          outpt.classList.toggle("highlight");
+        })
+
+        // Demo 3: Input event — fires every keystroke
+        const inpt = document.getElementById("get-input");
+        const otpt = document.getElementById("input-stroke");
+
+        inpt.addEventListener("input",  function(event){
+          const val =  event.target.value;
+        
+          console.log("You typed: " + val);
+          const printValue = (val) ? otpt.textContent = "You typed: " + val : otpt.textContent = "Waiting for input";
+        })
+         // Demo 4: Event bubbling
+         const parentListener = document.getElementById("parent-listener");
+         const childButton = document.getElementById("child-btn");
+         const childStop = document.getElementById("child-stop");
+         const log = document.getElementById("log");
+
+         function addLog(msg){
+            log.innerHTML += msg + "<br>";
+         }
+          
+        parentListener.addEventListener("click", function(){
+            addLog("🟦 Parent fired");
+            console.log("Demo 4: parent fired");
+        });
+        childButton.addEventListener("click" , function(){
+            addLog(" 🟩 Child fired → bubbles up to parent"); 
+            console.log("Demo 4: parent fired");
+        });
+        childStop.addEventListener("click" , function(event){
+          event.stopPropagation();
+          addLog("🟥 Child (stop) fired → bubble stopped");
+          console.log("Demo 4: parent fired");
+        });
+        
+        function clearLog(){
+            log.innerHTML = " ";
+        }
+        
+
+    </script>
+</body>
+</html> 

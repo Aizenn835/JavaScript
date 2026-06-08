@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 5 - Arrays & DOM</title>
+</head>
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        height:100vh;
+    }
+    h2{
+        border-bottom:2px solid black;
+        padding-bottom: 10px;
+    }
+    .box{
+        gap:10px;
+        margin-top:5px;
+        width:20vh;
+        height: 3vh;
+        padding-left: -40px;
+    }
+    input{
+        border:1px solid black;
+        padding:10px;
+        width:30%;
+    }
+    button{
+        padding:10px;
+        background:white;
+        outline:none;
+        user-select: none;
+        font-weight:bold;
+        border:1px solid black;
+    }
+    button:hover{
+        background-color: black;
+        color:white;
+    }
+    h4 { font-weight: 600; }
+    li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    list-style: none;
+}
+    
+</style>
+<body>
+    <h2>Arrays & DOM</h2>
+    <p>Create an array of 5 student names. Loop with `forEach` and render each as an li — no `innerHTML` string building</p>
+     <input type="text" placeholder="Enter student name" id="input">
+    <div class="box" >
+        <button id="add">Add Student</button>
+        <button id="cancel">Cancel</button>
+    </div>
+    <h4>Student List:</h4>
+    <ul id="list"></ul>
+
+
+    <script>
+        let students =  ["Anna" , "Lei" , "Celyn" , "Juan"];
+        
+
+       function render(){
+        const getList = document.getElementById("list");
+        getList.innerHTML = "";
+      
+        students.forEach(function(name , index){
+            const list = document.createElement("li");
+            const span = document.createElement("span");
+            span.textContent = name;
+
+            const btn = document.createElement("button");
+            btn.textContent = "Delete";
+            
+            
+            btn.addEventListener("click", function(){
+                students.splice(index ,  1);
+                render();
+            })
+           list.appendChild(span);
+           list.appendChild(btn)
+           getList.appendChild(list);
+        })
+       }
+        const addStudent = document.getElementById("add");
+
+        addStudent.addEventListener("click" , function(){
+            const inp = document.getElementById("input");
+            const name = inp.value.trim();
+        
+            if(name){
+                students.push(name);
+                inp.value = "";
+                render();
+            }
+        })
+
+        const cancelStudent = document.getElementById("cancel");
+
+        cancelStudent.addEventListener("click" , function(){
+            const deleteStudent = document.getElementById("input");
+            deleteStudent.value = "";
+        })
+        render();
+    </script>
+</body>
+</html>

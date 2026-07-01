@@ -440,3 +440,364 @@ The parts that feel slow to write are the parts you haven't actually internalize
 ---
 
 *Week 2 coming after Week 1 is done — arrays deep dive, fetch(), and connecting to a real backend.*
+
+🔁 Frontend Restart — Week 2: Arrays Deep Dive, Fetch & Real Backend Connections
+Continuing the challenge: understand *why* things work, not just copy-paste them. Week 1 built the DOM/event foundation. Week 2 connects that foundation to real async data and the patterns you'll actually use in LibraryHub.
+
+Rules
+✅ 1 hour per day
+✅ Type everything by hand — no copying
+✅ Use MDN Docs when stuck — not AI
+✅ Sit with a bug for at least 20 minutes before googling
+✅ Check everything in the browser Console (F12) and Network tab
+
+File Structure
+frontend-restart/
+│
+└── week2/
+    ├── day1/
+    │   └── index.html   ← Closures inside loops
+    ├── day2/
+    │   └── index.html   ← Event delegation
+    ├── day3/
+    │   └── index.html   ← fetch() & async/await basics
+    ├── day4/
+    │   └── index.html   ← Handling real API responses & errors
+    ├── day5/
+    │   └── index.html   ← dataset & syncing UI state
+    ├── day6/
+    │   └── index.html   ← Mini project — fetch + render + delegate (no AI)
+    └── day7/
+        └── index.html   ← Review & connect to real backend
+
+Day 1 — Closures Inside Loops
+Concepts: closures, `var` vs `let` scoping, why loop variables "stick" to the wrong value
+
+Tasks:
+1. Build a list of 5 buttons using a `for` loop with `var i`. Each button's click should log its own index.
+2. Click each button. Do they log the index you expect, or do they all log the same number?
+3. Change `var i` to `let i` and try again. What changed?
+4. Now do the same thing with `.forEach()` instead of a `for` loop — does it have the same problem as `var`? Why or why not?
+
+Starter template:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day 1 - Closures in Loops</title>
+</head>
+<body>
+  <div id="buttons"></div>
+</body>
+<script>
+  const container = document.getElementById("buttons");
+
+  // Try this first with var, then switch to let
+  for (var i = 0; i < 5; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = "Button " + i;
+    btn.addEventListener("click", function() {
+      console.log("You clicked button index:", i);
+    });
+    container.appendChild(btn);
+  }
+</script>
+</html>
+```
+
+What to understand by end of day:
+- Why `var` is function-scoped and `let` is block-scoped
+- Why each loop iteration with `let` creates a *new* variable binding, but `var` reuses one shared binding
+- Why this exact bug is the #1 reason dynamically-created buttons "click the wrong item" in real apps
+
+---
+
+Day 2 — Event Delegation
+Concepts: event bubbling (from Week 1 Day 4), one listener vs many, `event.target`, `.closest()`
+
+Tasks:
+1. Take your Day 1 button list. Instead of attaching a listener to each button, attach ONE listener to the parent `#buttons` div.
+2. Inside that single listener, use `event.target` to figure out which button was clicked.
+3. Now make it so clicking anywhere *inside* a button (like an icon you add inside it) still correctly identifies the button — use `.closest()`.
+4. Dynamically add 3 more buttons *after* the page loads (via a separate "Add Button" button). Do they still work with your delegated listener without adding new code? Why?
+
+Starter template:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day 2 - Event Delegation</title>
+</head>
+<body>
+  <button id="add-btn">Add Button</button>
+  <div id="buttons"></div>
+</body>
+<script>
+  const container = document.getElementById("buttons");
+  let count = 0;
+
+  function addButton() {
+    const btn = document.createElement("button");
+    btn.textContent = "Button " + count;
+    btn.dataset.index = count;
+    container.appendChild(btn);
+    count++;
+  }
+
+  // Pre-add a few
+  addButton(); addButton(); addButton();
+
+  document.getElementById("add-btn").addEventListener("click", addButton);
+
+  // ONE listener on the parent instead of one per button
+  container.addEventListener("click", function(event) {
+    const clickedBtn = event.target.closest("button");
+    if (!clickedBtn) return;
+    console.log("Clicked button with index:", clickedBtn.dataset.index);
+  });
+</script>
+</html>
+```
+
+What to understand by end of day:
+- Why delegation automatically works for elements added *after* the listener was set up (this is the part that trips up beginners)
+- Why `.closest()` matters when the click target is a child element (like an `<i>` icon) inside your button
+- The tradeoff: delegation is more efficient for large/dynamic lists, but slightly harder to read for beginners
+
+---
+
+Day 3 — fetch() & async/await Basics
+Concepts: Promises, `async`/`await`, `.then()` vs `await`, `response.json()`
+
+Tasks:
+1. Use a free public API (e.g. `https://jsonplaceholder.typicode.com/users`) to fetch a list of fake users.
+2. Write it once using `.then()` chains.
+3. Rewrite the *same* function using `async`/`await`. Compare readability.
+4. Log the raw `response` object before calling `.json()` — what does it actually contain? What is `response.ok`, `response.status`?
+
+Starter template:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day 3 - Fetch Basics</title>
+</head>
+<body>
+  <ul id="user-list"></ul>
+</body>
+<script>
+  // Version 1: .then() chains
+  function loadUsersThen() {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(function(response) {
+        console.log("status:", response.status, "ok:", response.ok);
+        return response.json();
+      })
+      .then(function(users) {
+        console.log(users);
+      })
+      .catch(function(error) {
+        console.log("Error:", error);
+      });
+  }
+
+  // Version 2: async/await — rewrite the same logic yourself
+  async function loadUsersAwait() {
+    // TODO: try/catch, await fetch, check response.ok, await response.json()
+  }
+
+  loadUsersThen();
+</script>
+</html>
+```
+
+What to understand by end of day:
+- `async`/`await` is just syntax sugar over Promises — same thing, easier to read top-to-bottom
+- Why `fetch()` does NOT throw an error on 404/401/500 — only on network failure — and why you must check `response.ok` yourself
+- Why you need `await` twice: once for the network response, once for parsing the JSON body
+
+---
+
+Day 4 — Handling Real API Responses & Errors
+Concepts: `try/catch`, status codes, guard clauses, avoiding repeated auth-check code
+
+Tasks:
+1. Fetch a URL that doesn't exist (typo the endpoint) and observe what happens without a `try/catch`.
+2. Add `try/catch` around it. What does the `catch` block receive?
+3. Simulate a 401 by fetching a URL that requires auth you don't have. Write a guard clause that checks `response.status` and handles it.
+4. Refactor: since you'll repeat the same 401/403 check in many functions, write ONE reusable helper function that takes a `response` and returns `true`/`false` for "should I redirect to login."
+
+Starter template:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day 4 - Errors & Guard Clauses</title>
+</head>
+<body></body>
+<script>
+  // Reusable auth guard — call this at the top of every fetch function
+  function isUnauthorized(response) {
+    return response.status === 401 || response.status === 403;
+  }
+
+  async function loadData(url) {
+    try {
+      const response = await fetch(url);
+
+      if (isUnauthorized(response)) {
+        console.log("Redirect to login here");
+        return null;
+      }
+
+      if (!response.ok) {
+        console.log("Request failed with status:", response.status);
+        return null;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log("Network or parsing error:", error);
+      return null;
+    }
+  }
+
+  loadData("https://jsonplaceholder.typicode.com/nonexistent-endpoint");
+</script>
+</html>
+```
+
+What to understand by end of day:
+- The difference between a network error (caught by `catch`) and an HTTP error status (you must check manually)
+- Why pulling repeated logic into a small helper function (`isUnauthorized`) is a DRY / clean-code practice
+- How this maps directly to the repeated `401 || 403` blocks in your LibraryHub `script.js`
+
+---
+
+Day 5 — dataset & Syncing UI State
+Concepts: `data-*` attributes, `element.dataset`, keeping JS state and DOM state in sync
+
+Tasks:
+1. Render a list of 5 "book" cards from a hardcoded array, each with a `data-book-id` attribute matching the book's id.
+2. Add a "favorite" button per card. Clicking it should toggle a CSS class AND update an in-memory array of favorite ids — using `dataset` to know which book was clicked.
+3. Simulate reloading the page (call your render function again) and make sure buttons whose id is in your favorites array show as "favorited" immediately, without re-clicking.
+4. Bonus: do this with event delegation (from Day 2) instead of one listener per card.
+
+Starter template:
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day 5 - dataset & State Sync</title>
+  <style>
+    .favorited { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div id="grid"></div>
+</body>
+<script>
+  const books = [
+    { id: 1, name: "Clean Code" },
+    { id: 2, name: "Effective Java" },
+    { id: 3, name: "You Don't Know JS" },
+  ];
+  let favoriteIds = [2]; // pretend this came from the server
+
+  function render() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    books.forEach(book => {
+      const card = document.createElement("div");
+      card.dataset.bookId = book.id;
+      card.innerHTML = `
+        <span>${book.name}</span>
+        <button class="fav-btn">♥</button>
+      `;
+
+      const favBtn = card.querySelector(".fav-btn");
+      if (favoriteIds.includes(book.id)) {
+        favBtn.classList.add("favorited");
+      }
+
+      grid.appendChild(card);
+    });
+  }
+
+  // TODO: add ONE delegated click listener on #grid
+  // - find the closest data-book-id from the click
+  // - toggle it in favoriteIds
+  // - toggle the "favorited" class on that button
+
+  render();
+</script>
+</html>
+```
+
+What to understand by end of day:
+- `dataset.bookId` reads/writes the `data-book-id` HTML attribute — it's how you attach an id to a DOM element without a global lookup
+- Why re-running `render()` after state changes (instead of manually poking the DOM) keeps your UI and data in sync — this is the same idea behind your `loadBooks()` re-render pattern
+- Why you convert ids to `String()` when comparing (`dataset` values are always strings, but your array might hold numbers)
+
+---
+
+Day 6 — Mini Project (No AI)
+Goal: Build a small "book favorites" app from scratch — no copying from previous days, no AI.
+
+What to build:
+- Fetch a list of items from `https://jsonplaceholder.typicode.com/posts?_limit=6` (pretend these are "books")
+- Render them as cards using a loop (no `innerHTML +=` string concatenation across multiple appends — build clean elements)
+- Add a favorite toggle button per card using **event delegation**, not per-card listeners
+- Use `try/catch` and a guard clause for failed responses
+- A counter showing how many are currently favorited
+
+Rules:
+- Write it completely from memory
+- If stuck, check MDN — not AI
+- It doesn't have to look good. It just has to work.
+
+What to notice: which parts felt slow — closures, delegation, or the fetch/error handling? Write it down, that's your focus for reviewing LibraryHub's actual code next.
+
+---
+
+Day 7 — Review & Connect to Real Backend
+Goal: Take everything from Week 2 and map it onto your actual LibraryHub `script.js`.
+
+Tasks:
+1. Open your real `renderBooks()` function. Identify every spot where a listener is attached *inside* the `forEach` loop. Pick ONE (start with `.btn-fav`) and refactor it to use event delegation on `#books-grid` instead.
+2. Find every repeated `if(response.status === 401 || response.status === 403)` block across your file. Replace them with the `isUnauthorized(response)` helper pattern from Day 4.
+3. In `loadBooks()`, you `await` the books fetch, then separately `await loadFavorite()`. Look up `Promise.all()` — could these two independent fetches run at the same time instead of one after another? Try rewriting it.
+4. Use DevTools Network tab: throttle your connection to "Slow 3G" and click around your real app. Does anything break or feel broken while waiting? Where would a loading state help?
+
+Reflection — write down answers to these:
+- Which Week 2 concept mattered most for understanding your *own* LibraryHub code?
+- After refactoring `.btn-fav` to use delegation, did the app behave any differently, or just read cleaner?
+- What's your Week 3 focus list? (e.g. loading states, debouncing search input, modal state management)
+
+Progress Tracker
+Day | Topic | Status
+--- | --- | ---
+Day 1 | Closures inside loops | ⬜
+Day 2 | Event delegation | ⬜
+Day 3 | fetch() & async/await basics | ⬜
+Day 4 | Handling real API responses & errors | ⬜
+Day 5 | dataset & syncing UI state | ⬜
+Day 6 | Mini project (no AI) | ⬜
+Day 7 | Review & connect to real backend | ⬜
+
+Change ⬜ to ✅ as you complete each day.
+
+Resources
+- MDN Web Docs — your main reference, not AI
+- JavaScript.info — Promises, async/await, and closures chapters
+- Browser DevTools — Network tab (throttling) and Console
+- jsonplaceholder.typicode.com — free fake API for practicing fetch without touching your real backend
+
+Week 3 coming after Week 2 is done — debouncing input, loading/skeleton states, and modal state management.
